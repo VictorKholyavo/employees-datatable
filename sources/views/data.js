@@ -11,20 +11,42 @@ export default class DataView extends JetView {
 					margin: 20,
 					select: true,
 					columns: [
-						{id: "firstname", fillspace: true, header: "First Name"},
-						{id: "surname", fillspace: true, header: "Surname"},
-						{id: "dateofbirth", fillspace: true, header: "Date of Birth"},
-						{id: "salary", fillspace: true, header: "Salary"},
+						{id: "index", header:"", sort:"int"},
+						{id: "firstname", sort:"server", fillspace: true, header: "First Name"},
+						{id: "surname", sort:"server", fillspace: true, header: "Surname"},
+						{id: "dateofbirth", format: webix.Date.dateToStr("%d %M %Y"), sort:"date", fillspace: true, header: "Date of Birth"},
+						{id: "salary", sort:"server", fillspace: true, header: "Salary", template: (obj) => {
+							return obj.salary + " RUB";
+						}
+						},
 					],
 					url: "http://localhost:3015/employees",
 					save: {
 						url: "rest->http://localhost:3015/employees",
 						updateFromResponse: true
 					},
-					on:{
-						onAfterSelect: (id) => {
-							this.setParam("id", id, true);
+					datafetch: 25,
+					scheme: {
+						$init: function (obj) {
+							const parser = webix.Date.strToDate("%Y-%m-%d");
+							obj.dateofbirth = parser(obj.dateofbirth);
 						}
+					},
+					on: {
+						"data->onStoreUpdated": function() {
+							this.data.each(function(obj, i) {
+								obj.index = i+1;
+							});
+						},
+						onItemDblClick: (id) => {
+							const form = this.FormforEmployees;
+							const datatable = this.$$("datatable");
+							const values = datatable.getItem(id);
+							this.FormforEmployees.showWindow(values, function (data) {
+								datatable.updateItem(id, data);
+								form.hide();
+							});
+						},
 					},
 
 					css: "webix_shadow_medium" 
@@ -40,8 +62,8 @@ export default class DataView extends JetView {
 								const form = this.FormforEmployees;
 								const datatable = this.$$("datatable");
 								this.FormforEmployees.showWindow("", function(data) {
-									datatable.updateItem(1, data)
-									form.hide()
+									datatable.add(data);
+									form.hide();
 								});
 							}
 						},
@@ -53,10 +75,10 @@ export default class DataView extends JetView {
 							click: () => {
 								const form = this.FormforEmployees;
 								const datatable = this.$$("datatable");
-								const id = this.getParam("id", true);
+								let id = this.$getDatatable().getSelectedId(false, true);
 								const values = datatable.getItem(id);
 								this.FormforEmployees.showWindow(values, function(data) {
-									datatable.updateItem(1, data);
+									datatable.updateItem(id, data);
 									form.hide();
 								});
 							}
@@ -65,15 +87,23 @@ export default class DataView extends JetView {
 							view: "button",
 							localId: "removeButton",
 							value: "Remove",
-							type: "form"
+							hotkey: "delete",
+							type: "form",
+							click: () => {
+								let id = this.$getDatatable().getSelectedId(false, true);
+								this.$getDatatable().remove(id);
+								return false;
+							}
 						}
 					]
 				}
 			]
 		};
 	}
+	$getDatatable() {
+		return this.$$("datatable");
+	}
 	init() {
 		this.FormforEmployees = this.ui(FormforEmployeesView);
-		// this.$$("datatable").parse(data);
 	}
 }

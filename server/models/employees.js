@@ -1,5 +1,7 @@
+const Sequelize = require('sequelize');
+
 module.exports = (sequelize, type) => {
-    return sequelize.define('employees', {
+    return sequelize.define("employees", {
         id: {
             type: type.INTEGER,
             autoIncrement: true,
@@ -7,6 +9,11 @@ module.exports = (sequelize, type) => {
         },
         firstname: type.STRING,
         surname: type.STRING,
+        dateofbirth: {
+            type: Sequelize.DATEONLY,
+            allowNull: false,
+            defaultValue: Sequelize.NOW
+        },
         salary: type.INTEGER
     });
 }

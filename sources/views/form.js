@@ -1,4 +1,4 @@
-import {JetView} from "webix-jet";
+import { JetView } from "webix-jet";
 
 export default class FormforEmployeesView extends JetView {
 	config() {
@@ -17,35 +17,37 @@ export default class FormforEmployeesView extends JetView {
 					name: "surname",
 					label: "Surname"
 				},
-				// {
-				// 	view: "richselect",
-				// 	name: "partOfSpeech",
-				// 	label: "Part of speech"
-				// },
+				{
+					view: "datepicker",
+					label: "Date of Birth",
+					labelPosition: "left",
+					format: "%d.%m.%Y",
+					name: "dateofbirth",
+					width: 300,
+				},
+				{
+					view: "text",
+					name: "salary",
+					label: "Salary"
+				},
 				{
 					cols: [
 						{
 							view: "button",
 							localId: "updateButton",
 							value: "Save",
+							hotkey: "Enter",
 							click: () => {
 								const values = this.$getForm().getValues();
 								this.onSubmit(values);
-							}
-						},
-						{
-							view: "button",
-							localId: "closeButton",
-							value: "Close",
-							click: function () {
-								this.getTopParentView().hide();
 							}
 						}
 					]
 				}
 			],
 			rules: {
-				$all: webix.rules.isNotEmpty
+				$all: webix.rules.isNotEmpty,
+				salary: webix.rules.isNumber
 			}
 		};
 
@@ -56,8 +58,15 @@ export default class FormforEmployeesView extends JetView {
 			position: "center",
 			modal: true,
 			head: {
-				template: " ",
-				localId: "formTemplate"
+				view: "toolbar",
+				cols: [
+					{ template: " ", type: "header", localId: "formTemplate" },
+					{
+						view: "icon", icon: "wxi-close", click: () => {
+							this.$$("popup").hide();
+						}
+					}
+				]
 			},
 			body: form,
 			on: {
@@ -73,13 +82,13 @@ export default class FormforEmployeesView extends JetView {
 		this.getRoot().show();
 		if (values) {
 			this.$getForm().setValues(values);
-			formTemplate.define({template: "Edit word"});
+			formTemplate.define({ template: "Edit employee" });
 		}
 		else {
-			formTemplate.define({template: "Add word"});
+			formTemplate.define({ template: "Add employee" });
 		}
 		formTemplate.refresh();
-		this.onSubmit = function(data) {
+		this.onSubmit = function (data) {
 			if (this.$getForm().validate()) {
 				filled(data);
 			}
