@@ -3,15 +3,14 @@ import FormforEmployeesView from "./form";
 
 export default class DataView extends JetView {
 	config() {
-		return { 
+		return {
 			rows: [
 				{
 					view: "datatable",
-					localId: "datatable", 
+					localId: "datatable",
 					margin: 20,
 					select: true,
 					columns: [
-						{id: "index", header:"", sort:"int"},
 						{id: "firstname", sort:"server", fillspace: true, header: "First Name"},
 						{id: "surname", sort:"server", fillspace: true, header: "Surname"},
 						{id: "dateofbirth", format: webix.Date.dateToStr("%d %M %Y"), sort:"date", fillspace: true, header: "Date of Birth"},
@@ -33,23 +32,18 @@ export default class DataView extends JetView {
 						}
 					},
 					on: {
-						"data->onStoreUpdated": function() {
-							this.data.each(function(obj, i) {
-								obj.index = i+1;
-							});
-						},
 						onItemDblClick: (id) => {
 							const form = this.FormforEmployees;
-							const datatable = this.$$("datatable");
-							const values = datatable.getItem(id);
-							this.FormforEmployees.showWindow(values, function (data) {
+							const datatable = this.$getDatatable();
+							const values = datatable.getSelectedItem();
+							this.form.showWindow(values, function (data) {
 								datatable.updateItem(id, data);
 								form.hide();
 							});
 						},
 					},
 
-					css: "webix_shadow_medium" 
+					css: "webix_shadow_medium"
 				},
 				{
 					cols: [
@@ -60,8 +54,8 @@ export default class DataView extends JetView {
 							type: "form",
 							click: () => {
 								const form = this.FormforEmployees;
-								const datatable = this.$$("datatable");
-								this.FormforEmployees.showWindow("", function(data) {
+								const datatable = this.$getDatatable();
+								this.form.showWindow("", function(data) {
 									datatable.add(data);
 									form.hide();
 								});
@@ -74,10 +68,9 @@ export default class DataView extends JetView {
 							type: "form",
 							click: () => {
 								const form = this.FormforEmployees;
-								const datatable = this.$$("datatable");
-								let id = this.$getDatatable().getSelectedId(false, true);
-								const values = datatable.getItem(id);
-								this.FormforEmployees.showWindow(values, function(data) {
+								const datatable = this.$getDatatable();
+								const values = datatable.getSelectedItem();
+								this.form.showWindow(values, function(data) {
 									datatable.updateItem(id, data);
 									form.hide();
 								});
