@@ -55,7 +55,7 @@ export default class DataView extends JetView {
 							click: () => {
 								const form = this.FormforEmployees;
 								const datatable = this.$getDatatable();
-								this.form.showWindow("", function(data) {
+								form.showWindow("", function(data) {
 									datatable.add(data);
 									form.hide();
 								});
@@ -70,7 +70,7 @@ export default class DataView extends JetView {
 								const form = this.FormforEmployees;
 								const datatable = this.$getDatatable();
 								const values = datatable.getSelectedItem();
-								this.form.showWindow(values, function(data) {
+								form.showWindow(values, function(data) {
 									datatable.updateItem(id, data);
 									form.hide();
 								});
